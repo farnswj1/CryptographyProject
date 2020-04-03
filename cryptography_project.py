@@ -5,7 +5,15 @@ Cryptography Project
 '''
 
 from time import sleep
-import rsa, helper, sha1, sha224, sha256, sha384, sha512, sha512_224, sha512_256
+import rsa
+import helper
+import sha1
+import sha224
+import sha256
+import sha384
+import sha512
+import sha512_224
+import sha512_256
 
 
 def print_program_info():
@@ -17,10 +25,10 @@ def print_program_info():
     sleep(3)
     
 
-#Main program function
+# Main program function
 def main():
     while True:
-        #User inputs bitsize
+        # User inputs bitsize
         while True:
             try:
                 bits = int(input('Select the desired number of bits for your primes (64 minimum): '))
@@ -35,10 +43,10 @@ def main():
             except:
                 print('This is not an integer.')
         
-        #Calculate max blocksize
+        # Calculate max blocksize
         max_blocks = rsa.max_block_val(bits)
         
-        #User inputs number of primes
+        # User inputs number of primes
         while True:
             try:
                 primes = int(input('Select the desired number of primes (2 minimum): '))
@@ -49,7 +57,7 @@ def main():
             except:
                 print('This is not an integer.')
         
-        #User inputs blocksize
+        # User inputs blocksize
         while True:
             try:
                 user_block_size = int(input('Select the desired blocksize (1 - ' + str(max_blocks) + '): '))
@@ -60,7 +68,7 @@ def main():
             except:
                 print('This is not an integer.')
         
-        #Key/modulus generation and testing
+        # Key/modulus generation and testing
         print('Generating modulus and keys for RSA...')
         keys_and_mod = rsa.generate_keys(bits, primes)
         
@@ -70,20 +78,20 @@ def main():
             keys_and_mod = rsa.generate_keys(bits, primes)
             print('Testing keys and modulus...')
         
-        #Display public key, private key, and modulus
-        print('Public key: ' + str(keys_and_mod[3]))
-        print('Private key: ' + str(keys_and_mod[4]))
-        print('Modulus: ' + str(keys_and_mod[1]))
-        print('ϕ: ' + str(keys_and_mod[2]))
+        # Display public key, private key, and modulus
+        print('Public key: ' + str(keys_and_mod['public_key']))
+        print('Private key: ' + str(keys_and_mod['private_key']))
+        print('Modulus: ' + str(keys_and_mod['modulus']))
+        print('ϕ: ' + str(keys_and_mod['phi_n']))
         sleep(2)
         
-        #Display prime (optional)
+        # Display prime (optional)
         while True:
             try:
                 factor_option = str(input('Would you like to see the primes that generate the modulus? (Y/N): ')).upper()
                 if factor_option in ['Y', 'YES']:
-                    for i in range(len(keys_and_mod[0])):
-                        print('P' + str(i + 1) + ": " + str(keys_and_mod[0][i]))
+                    for i in range(len(keys_and_mod['primes'])):
+                        print('P' + str(i + 1) + ": " + str(keys_and_mod['primes'][i]))
                     sleep(2)
                     break
                 elif factor_option in ['N', 'NO']:
@@ -92,7 +100,7 @@ def main():
             except:
                 print('Invalid option!')
         
-        #User inputs plaintext
+        # User inputs plaintext
         while True:
             try:
                 plaintext = str(input('Insert your plaintext message: '))
@@ -100,13 +108,13 @@ def main():
             except:
                 print('This message will not work. Try another message.')
         
-        #Encrypting message
+        # Encrypting message
         print('Encrypting message...')
-        ciphertext = rsa.encrypt(plaintext, keys_and_mod[3], keys_and_mod[1], user_block_size)
+        ciphertext = rsa.encrypt(plaintext, keys_and_mod['public_key'], keys_and_mod['modulus'], user_block_size)
         print(ciphertext)
         sleep(2)
         
-        #Decrypting message (optional)
+        # Decrypting message (optional)
         while True:
             try:
                 decrypt_option = str(input('Would you like to decrypt this message? (Y/N): ')).upper()
@@ -118,7 +126,7 @@ def main():
         
         if decrypt_option in ['Y', 'YES']:
             print('Decrypting message...')
-            decrypted_message = rsa.decrypt(ciphertext, keys_and_mod[4], keys_and_mod[1], user_block_size)
+            decrypted_message = rsa.decrypt(ciphertext, keys_and_mod['private_key'], keys_and_mod['modulus'], user_block_size)
             print(decrypted_message)
             sleep(2)
             if decrypted_message == plaintext:
@@ -127,8 +135,8 @@ def main():
                 print('YOUR MESSAGE WAS CORRUPTED!')
             sleep(2)
         
-        #Encrypt message via hashing
-        #Only applies to 8-bit character strings
+        # Encrypt message via hashing
+        # Only applies to 8-bit character strings
         flag_for_hash = helper.is_8bit(plaintext)
         hash_option = ''
         while flag_for_hash:
@@ -151,7 +159,7 @@ def main():
             print('SHA-512:     ' + sha512.encrypt(plaintext))
             sleep(2)
         
-        #Resets program (optional)
+        # Resets program (optional)
         while True:
             try:
                 program_option = str(input('Would you like to restart this program? (Y/N): ')).upper()
@@ -170,23 +178,7 @@ def main():
         sleep(1) 
 
 
-#Executes program
+# Executes program
 if __name__ == '__main__':
     print_program_info()
     main()
-
-
-#References
-'''
-[1]  Al Sweigart, Cracking Codes with Python: An Introduction to Building and Breaking Ciphers, No Starch Press, San Francisco, CA, 2017
-[2]  Wade Trappe and Lawrence C. Washington, Introduction to Cryptography with Coding Theory, 2nd Edition, Pearson Education, Upper Saddle River, NJ, 2006
-[3]  https://www.geeksforgeeks.org/rotate-bits-of-an-integer/
-[4]  https://en.wikipedia.org/wiki/SHA-1
-[5]  https://en.wikipedia.org/wiki/SHA-2
-[6]  Secure Hash Standard, National Institute of Standards and Technology, Gathersburg, MD, 2015
-     http://dx.doi.org/10.6028/NIST.FIPS.180-4
-[7]  http://www.abrahamlincolnonline.org/lincoln/speeches/gettysburg.htm
-[8]  http://www.awon.org/dc3/
-[9]  https://en.wikipedia.org/wiki/AFI%27s_100_Years...100_Movie_Quotes
-[10] https://www.goodreads.com/work/quotes/10446115-rocky-balboa
-'''

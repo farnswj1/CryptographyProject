@@ -2,13 +2,13 @@ from math import gcd, log
 from random import randint
 from primality_tests import is_prime
 
-#Number Theory
+# Number Theory
 ############################################################################################################################################################################################################################################################################################################
 
-#Returns the modular inverse of a given mod n using the Euclidean algorithm [1]
+# Returns the modular inverse of a given mod n using the Euclidean algorithm
 def mod_inverse(a, n):
     if gcd(a, n) != 1:
-        return 'No inverse exists!'
+        return None
     u1, u2, u3 = 1, 0, a
     v1, v2, v3 = 0, 1, n
     while v3 != 0:
@@ -17,46 +17,53 @@ def mod_inverse(a, n):
     return u1 % n
 
 
-#Key Generator
+# Key Generator
 ############################################################################################################################################################################################################################################################################################################
 
 #Creates a list containing the primes, modulus n, ϕ(n), and keys e, d: [[factors of n], n, ϕ(n), e, d]
 #Supports multi-prime RSA
 def generate_keys(bit_size, primes = 2):
     if primes < 2:
-        return 'At least two primes are required for RSA!'
+        primes = 2
+
     n = 1
     phi_n = 1
-    key = [[]]
+    key = {'primes': [], 'modulus': None, 'phi_n': None, 'public_key': None, 'private_key': None}
+    
     if bit_size <= 32:
         min_n = 2147483648
         max_n = 4294967295
     else:
         min_n = pow(2, bit_size - 1)
         max_n = pow(2, bit_size) - 1
+    
     for i in range(primes):
         p = randint(min_n, max_n)
-        while p in key[0] or not is_prime(p):
+        while p in key['primes'] or not is_prime(p):
             p = randint(min_n, max_n)
-        key[0].append(p)
+        key['primes'].append(p)
         n *= p
         phi_n *= (p - 1)
-    key.append(n)
-    key.append(phi_n)
+    
+    key['modulus'] = n
+    key['phi_n'] = phi_n
+    
     while True:
         e = randint(65537, phi_n)
         if gcd(e, phi_n) == 1:
             d = mod_inverse(e, phi_n)
-            if (log(d, 10) + 1) > (3 * (log(phi_n, 10) + 1) / 4):
+            if d != None and (log(d, 10) + 1) > (3 * (log(phi_n, 10) + 1) / 4):
                 break
-    key.extend([e, d])
+    
+    key['public_key'] = e
+    key['private_key'] = d
     return key
 
 
-#String/Block Converter
+# String/Block Converter
 ############################################################################################################################################################################################################################################################################################################
 
-#Converts a string into blocks of integers [1]
+# Converts a string into blocks of integers
 def string_to_blocks(text, block_size):
     block_ints = []
     for block_start in range(0, len(text), block_size):
@@ -67,7 +74,7 @@ def string_to_blocks(text, block_size):
     return block_ints
 
 
-#Converts blocks of integers into a string [1]
+# Converts blocks of integers into a string
 def blocks_to_string(block_ints, block_size):
      text = []
      for block_int in block_ints:
@@ -81,19 +88,19 @@ def blocks_to_string(block_ints, block_size):
      return ''.join(text)
 
 
-#Finds the maximum block size [1]
+# Finds the maximum block size
 def max_block_val(bit_size):
     return int(log(pow(2, bit_size - 1), UNICODE_VAL))
 
 
-#Number of characters in the Unicode table: 1114112
-UNICODE_VAL = 1114112
+# Maximum number of characters in the Unicode table: 1114112
+UNICODE_VAL = 128
 
 
-#RSA Cryptosystem
+# RSA Cryptosystem
 ############################################################################################################################################################################################################################################################################################################
 
-#Encrypts a message using RSA
+# Encrypts a message using RSA
 def encrypt(message, e, n, block_size = 2):
     block_message = string_to_blocks(message, block_size)
     for i in range(len(block_message)):
@@ -101,7 +108,7 @@ def encrypt(message, e, n, block_size = 2):
     return '.'.join(block_message)
 
 
-#Decrypts a message using RSA
+# Decrypts a message using RSA
 def decrypt(block_message, d, n, block_size = 2):
     block_message = [int(i) for i in block_message.split('.')]
     for i in range(len(block_message)):
@@ -109,12 +116,12 @@ def decrypt(block_message, d, n, block_size = 2):
     return blocks_to_string(block_message, block_size)
 
 
-#Testing
+# Testing
 ############################################################################################################################################################################################################################################################################################################
 
-#Tests [n, e, d] using a specified number of iterations
+# Tests [n, e, d] using a specified number of iterations
 def test_keys(key, iterations = 10):
     for x in range(2, 2 + iterations):
-        if x != pow(pow(x, key[3], key[1]), key[4], key[1]):
+        if x != pow(pow(x, key['public_key'], key['modulus']), key['private_key'], key['modulus']):
             return False
     return True

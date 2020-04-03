@@ -1,13 +1,13 @@
 from hash_pre_processor import convert_32bit
 from bitwise_rotator import rotate_right_32bit
 
-#The 'Secure Hash Algorithm 224' cryptographic hash function
-#Converts a string of 8-bit characters into a 56-hexadecimal value
+# The 'Secure Hash Algorithm 224' cryptographic hash function
+# Converts a string of 8-bit characters into a 56-hexadecimal value
 def encrypt(string):
-    #Pre-processing converts input string into a bit array
+    # Pre-processing converts input string into a bit array
     string = convert_32bit(string)
     
-    #Variables
+    # Variables
     h0 = 0xc1059ed8
     h1 = 0x367cd507
     h2 = 0x3070dd17
@@ -34,8 +34,8 @@ def encrypt(string):
          0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
          0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2]
     
-    #Processing
-    #Partition and build bit array into lists of sixty-four 32-bit binary strings
+    # Processing
+    # Partition and build bit array into lists of sixty-four 32-bit binary strings
     for i in range(0, len(string), 512):
         bit_list = []
         
@@ -47,7 +47,7 @@ def encrypt(string):
             temp_B = rotate_right_32bit(bit_list[k - 2], 17) ^ rotate_right_32bit(bit_list[k - 2], 19) ^ bit_list[k - 2] >> 10
             bit_list.append((bit_list[k - 16] + temp_A + bit_list[k - 7] + temp_B) % 4294967296)
         
-        #Hash values
+        # Hash values
         a = h0
         b = h1
         c = h2
@@ -57,7 +57,7 @@ def encrypt(string):
         g = h6
         h = h7
         
-        #Hashing loop
+        # Hashing loop
         for j in range(64):
             s = rotate_right_32bit(e, 6) ^ rotate_right_32bit(e, 11) ^ rotate_right_32bit(e, 25)
             t = (e & f) ^ ((~e & 0xffffffff) & g)
@@ -84,12 +84,12 @@ def encrypt(string):
         h6 = (h6 + g) % 4294967296
         h7 = (h7 + h) % 4294967296
 
-    #Convert h-variables into hexadecimal, concatenate them, then return digest
+    # Convert h-variables into hexadecimal, concatenate them, then return digest
     digest = [hex(h0)[2:], hex(h1)[2:], hex(h2)[2:], hex(h3)[2:], hex(h4)[2:], hex(h5)[2:], hex(h6)[2:]]
     for i in range(len(digest)):
         digest[i] = '0' * (8 - len(digest[i])) + digest[i]
     return ''.join(digest)
 
 
-#'A Test' -> b68056babccb7935f4c7989bfaba95b2b5b381363f5ebd24b036ede0
-#print(encrypt('A Test') == 'b68056babccb7935f4c7989bfaba95b2b5b381363f5ebd24b036ede0')
+# 'A Test' -> b68056babccb7935f4c7989bfaba95b2b5b381363f5ebd24b036ede0
+# print(encrypt('A Test') == 'b68056babccb7935f4c7989bfaba95b2b5b381363f5ebd24b036ede0')

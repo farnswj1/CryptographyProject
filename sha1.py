@@ -1,21 +1,21 @@
 from hash_pre_processor import convert_32bit
 from bitwise_rotator import rotate_left_32bit
 
-#The 'Secure Hash Algorithm 1' cryptographic hash function
-#Converts a string of 8-bit characters into a 40-hexadecimal value
+# The 'Secure Hash Algorithm 1' cryptographic hash function
+# Converts a string of 8-bit characters into a 40-hexadecimal value
 def encrypt(string):
-    #Pre-processing converts input string into a bit array
+    # Pre-processing converts input string into a bit array
     string = convert_32bit(string)
 
-    #Variables
+    # Variables
     h1 = 1732584193
     h2 = 4023233417
     h3 = 2562383102
     h4 = 271733878
     h5 = 3285377520
     
-    #Processing
-    #Partition and build bit array into lists of eighty 32-bit binary strings
+    # Processing
+    # Partition and build bit array into lists of eighty 32-bit binary strings
     for i in range(len(string) // 512):
         bit_list = []
         partition = string[512 * i : 512 * (i + 1)]
@@ -26,14 +26,14 @@ def encrypt(string):
         for k in range(16, 80):     
             bit_list.append(rotate_left_32bit(bit_list[k - 3] ^ bit_list[k - 8] ^ bit_list[k - 14] ^ bit_list[k - 16], 1))
             
-        #Hash values
+        # Hash values
         a = h1
         b = h2
         c = h3
         d = h4
         e = h5
         
-        #Hashing loop
+        # Hashing loop
         for j in range(80):
             if j < 20:
                 f = (b & c) | ((~b & 0xFFFFFFFF) & d)
@@ -61,12 +61,12 @@ def encrypt(string):
         h4 = (h4 + d) % 4294967296
         h5 = (h5 + e) % 4294967296
 
-    #Convert h-variables into hexadecimal, concatenate them, then return digest
+    # Convert h-variables into hexadecimal, concatenate them, then return digest
     digest = [hex(h1)[2:], hex(h2)[2:], hex(h3)[2:], hex(h4)[2:], hex(h5)[2:]]
     for i in range(5):
         digest[i] = '0' * (8 - len(digest[i])) + digest[i]
     return ''.join(digest)
 
 
-#'A Test' -> 8f0c0855915633e4a7de19468b3874c8901df043
-#print(encrypt('A Test') == '8f0c0855915633e4a7de19468b3874c8901df043')
+# 'A Test' -> 8f0c0855915633e4a7de19468b3874c8901df043
+# print(encrypt('A Test') == '8f0c0855915633e4a7de19468b3874c8901df043')

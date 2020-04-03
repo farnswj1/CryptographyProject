@@ -1,13 +1,13 @@
 from hash_pre_processor import convert_64bit
 from bitwise_rotator import rotate_right_64bit
 
-#The 'Secure Hash Algorithm 512' cryptographic hash function
-#Converts a string of 8-bit characters into a 128-hexadecimal value
+# The 'Secure Hash Algorithm 512' cryptographic hash function
+# Converts a string of 8-bit characters into a 128-hexadecimal value
 def encrypt(string):
-    #Pre-processing converts input string into a bit array
+    # Pre-processing converts input string into a bit array
     string = convert_64bit(string)
     
-    #Variables
+    # Variables
     h0 = 0x6a09e667f3bcc908
     h1 = 0xbb67ae8584caa73b
     h2 = 0x3c6ef372fe94f82b
@@ -38,8 +38,8 @@ def encrypt(string):
          0x28db77f523047d84, 0x32caab7b40c72493, 0x3c9ebe0a15c9bebc, 0x431d67c49c100d4c,
          0x4cc5d4becb3e42b6, 0x597f299cfc657e2a, 0x5fcb6fab3ad6faec, 0x6c44198c4a475817]
     
-    #Processing
-    #Partition and build bit array into lists of eighty 32-bit binary strings
+    # Processing
+    # Partition and build bit array into lists of eighty 32-bit binary strings
     for i in range(0, len(string), 1024):
         bit_list = []
         partition = string[i : i + 1024]
@@ -52,7 +52,7 @@ def encrypt(string):
             temp_B = rotate_right_64bit(bit_list[k - 2], 19) ^ rotate_right_64bit(bit_list[k - 2], 61) ^ bit_list[k - 2] >> 6
             bit_list.append((bit_list[k - 16] + temp_A + bit_list[k - 7] + temp_B) % 18446744073709551616)
         
-        #Hash values
+        # Hash values
         a = h0
         b = h1
         c = h2
@@ -62,7 +62,7 @@ def encrypt(string):
         g = h6
         h = h7
         
-        #Hashing loop
+        # Hashing loop
         for j in range(80):
             s = rotate_right_64bit(e, 14) ^ rotate_right_64bit(e, 18) ^ rotate_right_64bit(e, 41)
             t = (e & f) ^ ((~e & 0xffffffffffffffff) & g)
@@ -89,12 +89,12 @@ def encrypt(string):
         h6 = (h6 + g) % 18446744073709551616
         h7 = (h7 + h) % 18446744073709551616
 
-    #Convert h-variables into hexadecimal, concatenate them, then return digest
+    # Convert h-variables into hexadecimal, concatenate them, then return digest
     digest = [hex(h0)[2:], hex(h1)[2:], hex(h2)[2:], hex(h3)[2:], hex(h4)[2:], hex(h5)[2:], hex(h6)[2:], hex(h7)[2:]]
     for i in range(len(digest)):
         digest[i] = '0' * (16 - len(digest[i])) + digest[i]
     return ''.join(digest)
 
 
-#'A Test' -> e170157eb8c7aaeb19820de5221b93e0b8eb92079e17eedf1ae4bab0b9b3893dca48e5f5201dc71de408131bb02797d3681e56f8e1713a51af44a544f97b1f7f
-#print(encrypt('A Test') == 'e170157eb8c7aaeb19820de5221b93e0b8eb92079e17eedf1ae4bab0b9b3893dca48e5f5201dc71de408131bb02797d3681e56f8e1713a51af44a544f97b1f7f')
+# 'A Test' -> e170157eb8c7aaeb19820de5221b93e0b8eb92079e17eedf1ae4bab0b9b3893dca48e5f5201dc71de408131bb02797d3681e56f8e1713a51af44a544f97b1f7f
+# print(encrypt('A Test') == 'e170157eb8c7aaeb19820de5221b93e0b8eb92079e17eedf1ae4bab0b9b3893dca48e5f5201dc71de408131bb02797d3681e56f8e1713a51af44a544f97b1f7f')
