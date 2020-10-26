@@ -8,30 +8,26 @@ def encrypt(string):
     string = convert_32bit(string)
 
     # Variables
-    h1 = 1732584193
-    h2 = 4023233417
-    h3 = 2562383102
-    h4 = 271733878
-    h5 = 3285377520
+    h0 = 1732584193
+    h1 = 4023233417
+    h2 = 2562383102
+    h3 = 271733878
+    h4 = 3285377520
     
     # Processing
     # Partition and build bit array into lists of eighty 32-bit binary strings
-    for i in range(len(string) // 512):
-        bit_list = []
-        partition = string[512 * i : 512 * (i + 1)]
-        
-        for j in range(0, 512, 32):
-            bit_list.append(int(partition[j : j + 32], 2))
+    for i in range(0, len(string), 512):
+        bit_list = [int(string[i+j : i+j+32], 2) for j in range(0, 512, 32)]
             
-        for k in range(16, 80):     
-            bit_list.append(rotate_left_32bit(bit_list[k - 3] ^ bit_list[k - 8] ^ bit_list[k - 14] ^ bit_list[k - 16], 1))
+        for j in range(16, 80):
+            bit_list.append(rotate_left_32bit(bit_list[j - 3] ^ bit_list[j - 8] ^ bit_list[j - 14] ^ bit_list[j - 16], 1))
             
         # Hash values
-        a = h1
-        b = h2
-        c = h3
-        d = h4
-        e = h5
+        a = h0
+        b = h1
+        c = h2
+        d = h3
+        e = h4
         
         # Hashing loop
         for j in range(80):
@@ -55,18 +51,16 @@ def encrypt(string):
             b = a
             a = temp
 
-        h1 = (h1 + a) % 4294967296
-        h2 = (h2 + b) % 4294967296
-        h3 = (h3 + c) % 4294967296
-        h4 = (h4 + d) % 4294967296
-        h5 = (h5 + e) % 4294967296
+        h0 = (h0 + a) % 4294967296
+        h1 = (h1 + b) % 4294967296
+        h2 = (h2 + c) % 4294967296
+        h3 = (h3 + d) % 4294967296
+        h4 = (h4 + e) % 4294967296
 
     # Convert h-variables into hexadecimal, concatenate them, then return digest
-    digest = [hex(h1)[2:], hex(h2)[2:], hex(h3)[2:], hex(h4)[2:], hex(h5)[2:]]
-    for i in range(5):
-        digest[i] = '0' * (8 - len(digest[i])) + digest[i]
-    return ''.join(digest)
+    return ''.join([hex(hvar)[2:].zfill(8) for hvar in (h0, h1, h2, h3, h4)])
 
 
 # 'A Test' -> 8f0c0855915633e4a7de19468b3874c8901df043
-# print(encrypt('A Test') == '8f0c0855915633e4a7de19468b3874c8901df043')
+if __name__ == "__main__":
+    print(encrypt('A Test') == '8f0c0855915633e4a7de19468b3874c8901df043')

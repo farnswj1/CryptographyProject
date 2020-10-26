@@ -17,7 +17,7 @@ def encrypt(string):
     h6 = 0xdb0c2e0d64f98fa7
     h7 = 0x47b5481dbefa4fa4
 
-    v = [0x428a2f98d728ae22, 0x7137449123ef65cd,
+    v = (0x428a2f98d728ae22, 0x7137449123ef65cd,
          0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc,
          0x3956c25bf348b538, 0x59f111f1b605d019,
          0x923f82a4af194f9b, 0xab1c5ed5da6d8118,
@@ -56,15 +56,12 @@ def encrypt(string):
          0x28db77f523047d84, 0x32caab7b40c72493,
          0x3c9ebe0a15c9bebc, 0x431d67c49c100d4c,
          0x4cc5d4becb3e42b6, 0x597f299cfc657e2a,
-         0x5fcb6fab3ad6faec, 0x6c44198c4a475817]
+         0x5fcb6fab3ad6faec, 0x6c44198c4a475817)
     
     # Processing
     # Partition and build bit array into lists of eighty 64-bit binary strings
     for i in range(0, len(string), 1024):
-        bit_list = []
-        
-        for j in range(0, 1024, 64):
-            bit_list.append(int(string[i + j : i + j + 64], 2))
+        bit_list = [int(string[i+j : i+j+64], 2) for j in range(0, 1024, 64)]
             
         for k in range(16, 80):
             temp_A = rotate_right_64bit(bit_list[k - 15], 1) ^ rotate_right_64bit(bit_list[k - 15], 8) ^ bit_list[k - 15] >> 7
@@ -109,11 +106,9 @@ def encrypt(string):
         h7 = (h7 + h) % 18446744073709551616
 
     # Convert h-variables into hexadecimal, concatenate them, then return digest
-    digest = [hex(h0)[2:], hex(h1)[2:], hex(h2)[2:], hex(h3)[2:], hex(h4)[2:], hex(h5)[2:]]
-    for i in range(len(digest)):
-        digest[i] = '0' * (16 - len(digest[i])) + digest[i]
-    return ''.join(digest)
+    return ''.join([hex(hvar)[2:].zfill(16) for hvar in (h0, h1, h2, h3, h4, h5)])
 
 
 # 'A Test' -> c16a9ebb2f60d96034ededabcdf30fee6eb062dc6a5356d2eeb72f3cf09f33849888ffa7f31a0fe402d75f33b00276e1
-# print(encrypt('A Test') == 'c16a9ebb2f60d96034ededabcdf30fee6eb062dc6a5356d2eeb72f3cf09f33849888ffa7f31a0fe402d75f33b00276e1')
+if __name__ == "__main__":
+    print(encrypt('A Test') == 'c16a9ebb2f60d96034ededabcdf30fee6eb062dc6a5356d2eeb72f3cf09f33849888ffa7f31a0fe402d75f33b00276e1')

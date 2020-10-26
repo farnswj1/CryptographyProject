@@ -17,7 +17,7 @@ def encrypt(string):
     h6 = 0x64f98fa7
     h7 = 0xbefa4fa4
 
-    v = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
+    v = (0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
          0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
          0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
          0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
@@ -32,15 +32,12 @@ def encrypt(string):
          0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5,
          0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
          0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208,
-         0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2]
+         0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2)
     
     # Processing
     # Partition and build bit array into lists of sixty-four 32-bit binary strings
     for i in range(0, len(string), 512):
-        bit_list = []
-        
-        for j in range(0, 512, 32):
-            bit_list.append(int(string[i + j : i + j + 32], 2))
+        bit_list = [int(string[i+j : i+j+32], 2) for j in range(0, 512, 32)]
             
         for k in range(16, 64):
             temp_A = rotate_right_32bit(bit_list[k - 15], 7) ^ rotate_right_32bit(bit_list[k - 15], 18) ^ bit_list[k - 15] >> 3
@@ -85,11 +82,9 @@ def encrypt(string):
         h7 = (h7 + h) % 4294967296
 
     # Convert h-variables into hexadecimal, concatenate them, then return digest
-    digest = [hex(h0)[2:], hex(h1)[2:], hex(h2)[2:], hex(h3)[2:], hex(h4)[2:], hex(h5)[2:], hex(h6)[2:]]
-    for i in range(len(digest)):
-        digest[i] = '0' * (8 - len(digest[i])) + digest[i]
-    return ''.join(digest)
+    return ''.join([hex(hvar)[2:].zfill(8) for hvar in (h0, h1, h2, h3, h4, h5, h6)])
 
 
 # 'A Test' -> b68056babccb7935f4c7989bfaba95b2b5b381363f5ebd24b036ede0
-# print(encrypt('A Test') == 'b68056babccb7935f4c7989bfaba95b2b5b381363f5ebd24b036ede0')
+if __name__ == "__main__":
+    print(encrypt('A Test') == 'b68056babccb7935f4c7989bfaba95b2b5b381363f5ebd24b036ede0')

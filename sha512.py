@@ -17,7 +17,7 @@ def encrypt(string):
     h6 = 0x1f83d9abfb41bd6b
     h7 = 0x5be0cd19137e2179
 
-    v = [0x428a2f98d728ae22, 0x7137449123ef65cd, 0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc,
+    v = (0x428a2f98d728ae22, 0x7137449123ef65cd, 0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc,
          0x3956c25bf348b538, 0x59f111f1b605d019, 0x923f82a4af194f9b, 0xab1c5ed5da6d8118,
          0xd807aa98a3030242, 0x12835b0145706fbe, 0x243185be4ee4b28c, 0x550c7dc3d5ffb4e2,
          0x72be5d74f27b896f, 0x80deb1fe3b1696b1, 0x9bdc06a725c71235, 0xc19bf174cf692694,
@@ -36,17 +36,13 @@ def encrypt(string):
          0xca273eceea26619c, 0xd186b8c721c0c207, 0xeada7dd6cde0eb1e, 0xf57d4f7fee6ed178,
          0x06f067aa72176fba, 0x0a637dc5a2c898a6, 0x113f9804bef90dae, 0x1b710b35131c471b,
          0x28db77f523047d84, 0x32caab7b40c72493, 0x3c9ebe0a15c9bebc, 0x431d67c49c100d4c,
-         0x4cc5d4becb3e42b6, 0x597f299cfc657e2a, 0x5fcb6fab3ad6faec, 0x6c44198c4a475817]
+         0x4cc5d4becb3e42b6, 0x597f299cfc657e2a, 0x5fcb6fab3ad6faec, 0x6c44198c4a475817)
     
     # Processing
     # Partition and build bit array into lists of eighty 32-bit binary strings
-    for i in range(0, len(string), 1024):
-        bit_list = []
-        partition = string[i : i + 1024]
+    for i in range(0, len(string), 1024):        
+        bit_list = [int(string[i+j : i+j+64], 2) for j in range(0, 1024, 64)]
         
-        for j in range(0, 1024, 64):
-            bit_list.append(int(partition[j : j + 64], 2))
-            
         for k in range(16, 80):
             temp_A = rotate_right_64bit(bit_list[k - 15], 1) ^ rotate_right_64bit(bit_list[k - 15], 8) ^ bit_list[k - 15] >> 7
             temp_B = rotate_right_64bit(bit_list[k - 2], 19) ^ rotate_right_64bit(bit_list[k - 2], 61) ^ bit_list[k - 2] >> 6
@@ -90,11 +86,9 @@ def encrypt(string):
         h7 = (h7 + h) % 18446744073709551616
 
     # Convert h-variables into hexadecimal, concatenate them, then return digest
-    digest = [hex(h0)[2:], hex(h1)[2:], hex(h2)[2:], hex(h3)[2:], hex(h4)[2:], hex(h5)[2:], hex(h6)[2:], hex(h7)[2:]]
-    for i in range(len(digest)):
-        digest[i] = '0' * (16 - len(digest[i])) + digest[i]
-    return ''.join(digest)
+    return ''.join([hex(hvar)[2:].zfill(16) for hvar in (h0, h1, h2, h3, h4, h5, h6, h7)])
 
 
 # 'A Test' -> e170157eb8c7aaeb19820de5221b93e0b8eb92079e17eedf1ae4bab0b9b3893dca48e5f5201dc71de408131bb02797d3681e56f8e1713a51af44a544f97b1f7f
-# print(encrypt('A Test') == 'e170157eb8c7aaeb19820de5221b93e0b8eb92079e17eedf1ae4bab0b9b3893dca48e5f5201dc71de408131bb02797d3681e56f8e1713a51af44a544f97b1f7f')
+if __name__ == "__main__":
+    print(encrypt('A Test') == 'e170157eb8c7aaeb19820de5221b93e0b8eb92079e17eedf1ae4bab0b9b3893dca48e5f5201dc71de408131bb02797d3681e56f8e1713a51af44a544f97b1f7f')

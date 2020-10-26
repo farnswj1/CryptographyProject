@@ -1,37 +1,41 @@
-#Pre-Processing Helper Module
+# Pre-Processing Helper Module
 
-# Converts input string into binary
+# Converts input string into a binary string
 def convert_to_binary(string):
-    string = list(string)
-
-    # Convert characters into bits
-    for i in range(len(string)):
-        string[i] = bin(ord(string[i]))[2:]
-        string[i] = '0' * (8 - len(string[i])) + string[i]
-    return ''.join(string)
+    return ''.join([bin(ord(char))[2:].zfill(8) for char in string])
 
 
 # Converts input string into a bit array (32-bit)
 def convert_32bit(string):
-    original_string_length = 8 * len(string)
-    
+    # Get the number of bits in the string mod (2**64)
+    original_string_length = (8 * len(string)) % (2 ** 64)
+
+    # Append a 1 to the binary string of the input string    
     string = convert_to_binary(string) + '1'
+
+    # Pad the binary string with 0's until it is 64 characters short of a multiple of 512
     string += '0' * ((448 - len(string)) % 512)
     
-    padding = bin(original_string_length)[2:]
-    padding = '0' * (64 - len(padding)) + padding
+    # Pad the original string length in bits so that it's 64 characters long
+    padding = bin(original_string_length)[2:].zfill(64)
 
+    # Return the pre-processed string
     return string + padding
 
 
 # Converts input string into a bit array (64-bit)
 def convert_64bit(string):
-    original_string_length = 8 * len(string)
+    # Get the number of bits in the string mod (2**128)
+    original_string_length = (8 * len(string)) % (2 ** 128)
     
+    # Append a 1 to the binary string of the input string 
     string = convert_to_binary(string) + '1'
+
+    # Pad the binary string with 0's until it is 64 characters short of a multiple of 1024
     string += '0' * ((896 - len(string)) % 1024)
     
-    padding = bin(original_string_length)[2:]
-    padding = '0' * (128 - len(padding)) + padding
-
+    # Pad the original string length in bits so that it's 128 characters long
+    padding = bin(original_string_length)[2:].zfill(128)
+    
+    # Return the pre-processed string
     return string + padding

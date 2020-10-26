@@ -4,13 +4,13 @@
 # Rotates bits to the left d times
 # Use for 32-bit integers only
 def rotate_left_32bit(n, d): 
-    return ((n << d) | (n >> (32 - d)) & 0xFFFFFFFF) % 4294967296
+    return ((n << d) | (n >> (32 - d)) & 0xffffffff) % 4294967296
 
 
 # Rotates bits to the right d times
 # Use for 32-bit integers only
 def rotate_right_32bit(n, d):
-    return ((n >> d) | (n << (32 - d)) & 0xFFFFFFFF) % 4294967296
+    return ((n >> d) | (n << (32 - d)) & 0xffffffff) % 4294967296
 
 
 # Rotates bits to the left d times
