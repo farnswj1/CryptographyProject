@@ -90,11 +90,8 @@ def generate_keys(bit_size, primes = 2):
 # String/Block Converter
 ############################################################################################################################################################################################################################################################################################################
 
-# Converts a string into blocks of integers
+# Uses a generator to convert a string into blocks of integers
 def string_to_blocks(text, block_size):
-    # The list will contain integer blocks
-    block_ints = []
-
     # Iterate through each chunk of text
     for block_start in range(0, len(text), block_size):
         block_int = 0
@@ -103,18 +100,12 @@ def string_to_blocks(text, block_size):
         for power, char in enumerate(text[block_start : block_start + block_size]):
             block_int += ord(char) * (UNICODE_VAL ** power)
         
-        # Add the block to the list
-        block_ints.append(block_int)
-    
-    # Return the list of integer blocks
-    return block_ints
+        # Yield the block (generator)
+        yield block_int
 
 
-# Converts blocks of integers into a string
+# Uses a generator to convert blocks of integers into a string
 def blocks_to_string(block_ints, block_size):
-    # The text will grow as the blocks are converted to string
-    text = ''
-
     # Iterate through each integer block
     for block_int in block_ints:
         block_message = []
@@ -128,11 +119,8 @@ def blocks_to_string(block_ints, block_size):
                 block_int %= (UNICODE_VAL ** power)
                 block_message.append(chr(char_index))
         
-        # Add the text to the list
-        text += ''.join(reversed(block_message))
-    
-    # Return the text in the form of a string
-    return text
+        # Yield the text (generator)
+        yield ''.join(reversed(block_message))
 
 
 # Finds the maximum block size
@@ -149,12 +137,16 @@ UNICODE_VAL = 128
 
 # Encrypts a message using RSA
 def encrypt(message, e, n, block_size = 2):
-    return '.'.join([str(pow(block, e, n)) for block in string_to_blocks(message, block_size)])
+    return '.'.join(
+        (f"{pow(block, e, n)}" for block in string_to_blocks(message, block_size))
+    )
 
 
 # Decrypts a message using RSA
 def decrypt(block_message, d, n, block_size = 2):
-    return blocks_to_string([pow(int(block), d, n) for block in block_message.split('.')], block_size)
+    return ''.join(
+        blocks_to_string((pow(int(block), d, n) for block in block_message.split('.')), block_size)
+    )
 
 
 # Testing
@@ -169,4 +161,4 @@ def test_keys(key, iterations = 10):
             return False
 
     # Return true if the keys passed the tests
-    return True
+    return True 
