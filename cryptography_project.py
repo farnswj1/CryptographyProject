@@ -108,7 +108,9 @@ def main():
         while True:
             try:
                 plaintext = str(input("Insert your plaintext message: "))
-                break
+                if plaintext:
+                    break
+                print("Invalid option!")
             except:
                 print("This message will not work. Try another message.")
         

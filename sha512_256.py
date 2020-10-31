@@ -106,7 +106,7 @@ def encrypt(string):
         h7 = (h7 + h) % 18446744073709551616
 
     # Convert h-variables into hexadecimal, concatenate them, then return digest
-    return ''.join([hex(hvar)[2:].zfill(8) for hvar in (h0, h1, h2, h3)])
+    return ''.join([hex(hvar)[2:].zfill(16) for hvar in (h0, h1, h2, h3)])
 
 
 # 'A Test' -> 6ae7125706fe567813ddaebacc962dd1625ebd9989a9cb86d27ff4f618748a6f
