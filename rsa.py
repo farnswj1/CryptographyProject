@@ -1,6 +1,8 @@
 from math import gcd, log
 from random import randint
 from primality_tests import is_prime
+from multiprocessing import Pool
+
 
 # Number Theory
 ############################################################################################################################################################################################################################################################################################################
@@ -50,7 +52,7 @@ def generate_keys(bit_size, primes = 2):
         max_n = pow(2, bit_size) - 1
     
     # Find primes
-    for i in range(primes):
+    for _ in range(primes):
         # Randomly generate a number that has the specified bit size
         p = randint(min_n, max_n)
 
@@ -136,17 +138,27 @@ UNICODE_VAL = 128
 ############################################################################################################################################################################################################################################################################################################
 
 # Encrypts a message using RSA
+# NOTE: multi-processing is used to speed up calculations (maximum of 8 CPU cores)
 def encrypt(message, e, n, block_size = 2):
-    return '.'.join(
-        (f"{pow(block, e, n)}" for block in string_to_blocks(message, block_size))
-    )
+    # Context manager
+    with Pool(8) as p:
+        # Generator feeds arguments into the pow() function in the next line
+        args = ((block, e, n) for block in string_to_blocks(message, block_size))
+
+        # Use multi-processing to encrypt the blocks, then concatenate and return them
+        return '.'.join((f"{result}" for result in p.starmap(pow, args)))
 
 
 # Decrypts a message using RSA
+# NOTE: multi-processing is used to speed up calculations (maximum of 8 CPU cores)
 def decrypt(block_message, d, n, block_size = 2):
-    return ''.join(
-        blocks_to_string((pow(int(block), d, n) for block in block_message.split('.')), block_size)
-    )
+    # Context manager
+    with Pool(8) as p:
+        # Generator feeds arguments into the pow() function in the next line
+        args = ((int(block), d, n) for block in block_message.split('.'))
+
+        # Use multi-processing to decrypt the blocks, then convert and return the message
+        return ''.join(blocks_to_string((result for result in p.starmap(pow, args)), block_size))
 
 
 # Testing
