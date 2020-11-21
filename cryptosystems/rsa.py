@@ -1,6 +1,6 @@
 from math import gcd, log
 from random import randint
-from primality_tests import is_prime
+from .primality_tests import is_prime
 from multiprocessing import Pool
 
 

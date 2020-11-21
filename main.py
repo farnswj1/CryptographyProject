@@ -4,16 +4,10 @@ Cryptography Project
 
 '''
 
+# Imported modules
 from time import sleep
-import rsa
-import helper
-import sha1
-import sha224
-import sha256
-import sha384
-import sha512
-import sha512_224
-import sha512_256
+from hashes import sha1, sha224, sha256, sha384, sha512, sha512_224, sha512_256, helper
+from cryptosystems import rsa
 
 
 # Main program function

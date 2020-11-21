@@ -1,21 +1,21 @@
-from hash_pre_processor import convert_64bit
-from bitwise_rotator import rotate_right_64bit
+from .hash_pre_processor import convert_64bit
+from .bitwise_rotator import rotate_right_64bit
 
-# The 'Secure Hash Algorithm 512/224' cryptographic hash function
-# Converts a string of 8-bit characters into a 56-hexadecimal value
+# The 'Secure Hash Algorithm 512/256' cryptographic hash function
+# Converts a string of 8-bit characters into a 64-hexadecimal value
 def encrypt(string):
     # Pre-processing converts input string into a bit array
     string = convert_64bit(string)
     
     # Variables
-    h0 = 0x8c3d37c819544da2
-    h1 = 0x73e1996689dcd4d6
-    h2 = 0x1dfab7ae32ff9c82
-    h3 = 0x679dd514582f9fcf
-    h4 = 0x0f6d2b697bd44da8
-    h5 = 0x77e36f7304c48942
-    h6 = 0x3f9d85a86a1d36c8
-    h7 = 0x1112e6ad91d692a1
+    h0 = 0x22312194fc2bf72c
+    h1 = 0x9f555fa3c84c64c2
+    h2 = 0x2393b86b6f53b151
+    h3 = 0x963877195940eabd
+    h4 = 0x96283ee2a88effe3
+    h5 = 0xbe5e1e2553863992
+    h6 = 0x2b0199fc2c85b8aa
+    h7 = 0x0eb72ddc81c52ca2 
 
     v = (0x428a2f98d728ae22, 0x7137449123ef65cd,
          0xb5c0fbcfec4d3b2f, 0xe9b5dba58189dbbc,
@@ -106,9 +106,9 @@ def encrypt(string):
         h7 = (h7 + h) % 18446744073709551616
 
     # Convert h-variables into hexadecimal, concatenate them, then return digest
-    return ''.join([hex(hvar)[2:].zfill(16) for hvar in (h0, h1, h2, h3)])[:56]
+    return ''.join([hex(hvar)[2:].zfill(16) for hvar in (h0, h1, h2, h3)])
 
 
-# 'A Test' -> 4ff26c1ae0f5b7318354ed01ff29c08b0761ba5f010c4eaf505351dc
+# 'A Test' -> 6ae7125706fe567813ddaebacc962dd1625ebd9989a9cb86d27ff4f618748a6f
 if __name__ == "__main__":
-    print(encrypt('A Test') == '4ff26c1ae0f5b7318354ed01ff29c08b0761ba5f010c4eaf505351dc')
+    print(encrypt('A Test') == '6ae7125706fe567813ddaebacc962dd1625ebd9989a9cb86d27ff4f618748a6f')

@@ -1,5 +1,5 @@
-from hash_pre_processor import convert_64bit
-from bitwise_rotator import rotate_right_64bit
+from .hash_pre_processor import convert_64bit
+from .bitwise_rotator import rotate_right_64bit
 
 # The 'Secure Hash Algorithm 512' cryptographic hash function
 # Converts a string of 8-bit characters into a 128-hexadecimal value

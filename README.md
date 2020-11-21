@@ -5,4 +5,4 @@ Notable features of this program include, but are not limited to primality testi
 
 WARNING: Hashing will only be allowed on 8-bit character strings!
 
-Run Command: `python cryptography_project.py`
+Run Command: `main.py`
